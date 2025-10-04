@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iDragon Adventures - Enhanced Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="welcomeScreen" id="welcomeScreen">
+        <div class="welcomeTitle">🦖 iDragon Adventures 🐉</div>
+        <button class="startButton" onclick="startGame()">START GAME</button>
+    </div>
+
+    <div class="gameContainer" id="gameContainer">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        
+        <div class="gameTitle">iDragon Adventures</div>
+        
+        <div class="highScoreDisplay">
+            <div class="highScoreLabel">HIGH SCORE</div>
+            <div class="highScoreValue" id="highScore">0</div>
+        </div>
+        
+        <div class="scoreBoard">
+            <div class="scoreLabel">SCORE</div>
+            <div class="scoreValue" id="score">0</div>
+        </div>
+        
+        <div class="instructions">
+            Press <kbd>↑</kbd> to Jump | <kbd>←</kbd> <kbd>→</kbd> to Move | <kbd>SPACE</kbd> to Start/Restart
+        </div>
+        
+        <div class="ground"></div>
+        <div class="dino" id="dino"></div>
+        <div class="obstacle" id="obstacle"></div>
+    </div>
+
+    <div class="gameOverlay" id="gameOverlay">
+        <div class="overlayContent">
+            <div class="overlayTitle">GAME OVER!</div>
+            <div class="overlaySubtitle">Your Score</div>
+            <div class="finalScore" id="finalScore">0</div>
+            <button class="restartButton" onclick="restartGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
