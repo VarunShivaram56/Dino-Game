@@ -3,7 +3,7 @@
 Welcome to **Varun Dragon Adventures**, an advanced and visually enhanced version of the classic Chrome Dino game — built using **HTML, CSS, and JavaScript** 🎨  
 Fly, jump, and dodge obstacles as your 🦖 dino faces off against the 🐉 dragon!
 
-![Game Screenshot](assets/preview.png) <!-- Optional: replace with your actual screenshot path -->
+
 
 ---
 
@@ -34,7 +34,6 @@ dino-game/
 ├── style.css          # Styling and animations
 ├── script.js          # Game logic and event handling
 ├── .github/
-│   └── workflows/
-│       └── deploy.yml # GitHub Actions CI/CD workflow
-└── assets/
-    └── preview.png    # (Optional) Screenshot for README
+   └── workflows/
+       └── deploy.yml # GitHub Actions CI/CD workflow
+
