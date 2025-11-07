@@ -5,452 +5,375 @@
 }
 
 body {
+    font-family: 'Arial', sans-serif;
     overflow: hidden;
-    font-family: 'Ubuntu', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+    touch-action: none;
 }
 
-.gameContainer {
+#gameContainer {
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #90EE90 100%);
     overflow: hidden;
 }
 
-/* Animated background clouds */
-.cloud {
+#gameTitle {
     position: absolute;
-    background: white;
-    border-radius: 100px;
-    opacity: 0.8;
-    animation: cloudMove 30s linear infinite;
-}
-
-.cloud::before, .cloud::after {
-    content: '';
-    position: absolute;
-    background: white;
-    border-radius: 100px;
-}
-
-.cloud1 {
-    width: 100px;
-    height: 40px;
-    top: 10%;
-    left: -100px;
-}
-
-.cloud1::before {
-    width: 50px;
-    height: 40px;
-    top: -20px;
-    left: 25px;
-}
-
-.cloud1::after {
-    width: 60px;
-    height: 30px;
-    top: -10px;
-    right: 20px;
-}
-
-.cloud2 {
-    width: 120px;
-    height: 45px;
-    top: 25%;
-    left: -120px;
-    animation-delay: -10s;
-    animation-duration: 35s;
-}
-
-.cloud2::before {
-    width: 60px;
-    height: 45px;
-    top: -22px;
-    left: 30px;
-}
-
-.cloud2::after {
-    width: 70px;
-    height: 35px;
-    top: -12px;
-    right: 25px;
-}
-
-.cloud3 {
-    width: 90px;
-    height: 35px;
-    top: 15%;
-    left: -90px;
-    animation-delay: -20s;
-    animation-duration: 40s;
-}
-
-.cloud3::before {
-    width: 45px;
-    height: 35px;
-    top: -18px;
-    left: 22px;
-}
-
-.cloud3::after {
-    width: 55px;
-    height: 28px;
-    top: -8px;
-    right: 18px;
-}
-
-@keyframes cloudMove {
-    from { left: -150px; }
-    to { left: 110vw; }
-}
-
-/* Ground */
-.ground {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 120px;
-    background: linear-gradient(to bottom, #8B7355 0%, #654321 100%);
-    border-top: 4px solid #2F4F2F;
-}
-
-.ground::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    width: 100%;
-    height: 10px;
-    background: repeating-linear-gradient(
-        90deg,
-        #228B22 0px,
-        #228B22 20px,
-        #32CD32 20px,
-        #32CD32 40px
-    );
-}
-
-/* Player dinosaur */
-.dino {
-    position: absolute;
-    bottom: 120px;
-    left: 100px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-    border-radius: 10px;
-    transition: left 0.2s ease;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     z-index: 10;
 }
 
-.dino::before {
-    content: '🦖';
+#scoreBoard {
     position: absolute;
-    font-size: 50px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.animateDino {
-    animation: dinoJump 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes dinoJump {
-    0%, 100% { bottom: 120px; }
-    50% { bottom: 380px; }
-}
-
-/* Obstacle dragon */
-.obstacle {
-    position: absolute;
-    bottom: 120px;
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: 80px;
+    right: 30px;
+    background: rgba(255,255,255,0.9);
+    padding: 15px 20px;
     border-radius: 10px;
-    z-index: 9;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 10;
 }
 
-.obstacle::before {
-    content: '🐉';
-    position: absolute;
-    font-size: 55px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.obstacleAni {
-    animation: obstacleMove 3s linear infinite;
-}
-
-@keyframes obstacleMove {
-    from { left: 100vw; }
-    to { left: -100px; }
-}
-
-/* UI Elements */
-.gameTitle {
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 48px;
-    font-weight: 900;
-    color: white;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.3),
-                 0 0 20px rgba(255,255,255,0.5);
-    z-index: 100;
-    animation: titlePulse 2s ease-in-out infinite;
-}
-
-@keyframes titlePulse {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.05); }
-}
-
-.scoreBoard {
-    position: absolute;
-    top: 100px;
-    right: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px 30px;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border: 3px solid #667eea;
-    z-index: 100;
-}
-
-.scoreLabel {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
-    color: #667eea;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-.scoreValue {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 36px;
-    color: #764ba2;
-    font-weight: 900;
-}
-
-.highScoreDisplay {
-    position: absolute;
-    top: 100px;
-    left: 40px;
-    background: rgba(255, 215, 0, 0.95);
-    padding: 15px 25px;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border: 3px solid #FF8C00;
-    z-index: 100;
-}
-
-.highScoreLabel {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    color: #8B4513;
-    font-weight: 700;
-}
-
-.highScoreValue {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 28px;
-    color: #8B4513;
-    font-weight: 900;
-}
-
-/* Game Over Overlay */
-.gameOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.gameOverlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.overlayContent {
-    text-align: center;
-    color: white;
-}
-
-.overlayTitle {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 72px;
-    font-weight: 900;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px rgba(255,255,255,0.5);
-    animation: gameOverPulse 1s ease-in-out infinite;
-}
-
-@keyframes gameOverPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.overlaySubtitle {
-    font-size: 24px;
-    margin-bottom: 10px;
-    opacity: 0.9;
-}
-
-.finalScore {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 48px;
-    margin: 20px 0;
-    color: #FFD700;
-}
-
-.restartButton {
-    margin-top: 30px;
-    padding: 18px 50px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
-}
-
-.restartButton:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
-}
-
-.restartButton:active {
-    transform: translateY(-1px);
-}
-
-/* Instructions */
-.instructions {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 15px 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    z-index: 100;
-    font-size: 18px;
+.score-item {
+    margin: 5px 0;
+    font-size: 1.2em;
     color: #333;
 }
 
-.instructions kbd {
-    background: #667eea;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-family: 'Orbitron', sans-serif;
-    margin: 0 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.score-label {
+    font-weight: bold;
+    color: #666;
 }
 
-/* Particle effect */
-.particle {
+#ground {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: #FFD700;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to bottom, #8B7355 0%, #654321 100%);
+    border-top: 4px solid #654321;
+}
+
+.cloud {
+    position: absolute;
+    width: 100px;
+    height: 40px;
+    background: white;
+    border-radius: 50px;
+    opacity: 0.8;
+    top: 15%;
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
     border-radius: 50%;
-    pointer-events: none;
-    animation: particleFade 0.8s ease-out forwards;
 }
 
-@keyframes particleFade {
-    to {
-        transform: translateY(-50px) scale(0);
-        opacity: 0;
-    }
+.cloud::before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
 }
 
-/* Welcome screen */
-.welcomeScreen {
+.cloud::after {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+    right: 10px;
+}
+
+#cloud1 {
+    animation: moveCloud1 25s linear infinite;
+}
+
+#cloud2 {
+    animation: moveCloud2 35s linear infinite;
+    top: 25%;
+}
+
+#cloud3 {
+    animation: moveCloud3 30s linear infinite;
+    top: 35%;
+}
+
+#cloud4 {
+    animation: moveCloud4 40s linear infinite;
+    top: 20%;
+}
+
+@keyframes moveCloud1 {
+    from { left: -120px; }
+    to { left: 100%; }
+}
+
+@keyframes moveCloud2 {
+    from { left: -120px; }
+    to { left: 100%; }
+}
+
+@keyframes moveCloud3 {
+    from { left: -120px; }
+    to { left: 100%; }
+}
+
+@keyframes moveCloud4 {
+    from { left: -120px; }
+    to { left: 100%; }
+}
+
+#dino {
+    position: absolute;
+    bottom: 100px;
+    left: 100px;
+    width: 60px;
+    height: 60px;
+    transition: bottom 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 5;
+}
+
+#dino svg {
+    width: 100%;
+    height: 100%;
+}
+
+.obstacle {
+    position: absolute;
+    bottom: 100px;
+    width: 40px;
+    height: 50px;
+    z-index: 4;
+}
+
+.obstacle svg {
+    width: 100%;
+    height: 100%;
+}
+
+#dragon {
+    position: absolute;
+    bottom: 160px;
+    width: 70px;
+    height: 50px;
+    z-index: 4;
+    display: none;
+}
+
+#dragon svg {
+    width: 100%;
+    height: 100%;
+}
+
+#welcomeScreen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: rgba(0,0,0,0.8);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
-    transition: opacity 0.5s ease;
+    z-index: 100;
 }
 
-.welcomeScreen.hidden {
-    opacity: 0;
-    pointer-events: none;
+#welcomeScreen h1 {
+    font-size: 3em;
+    color: #fff;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
 }
 
-.welcomeTitle {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 84px;
-    font-weight: 900;
+#welcomeScreen p {
+    font-size: 1.3em;
+    color: #ddd;
+    margin: 10px 0;
+    text-align: center;
+    max-width: 80%;
+}
+
+#startButton,
+#restartButton {
+    margin-top: 30px;
+    padding: 15px 40px;
+    font-size: 1.5em;
+    background: #4CAF50;
     color: white;
-    margin-bottom: 30px;
-    text-shadow: 0 0 30px rgba(255,255,255,0.5);
-    animation: welcomePulse 2s ease-in-out infinite;
-}
-
-@keyframes welcomePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.startButton {
-    padding: 25px 70px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #667eea;
-    background: white;
     border: none;
-    border-radius: 50px;
+    border-radius: 10px;
     cursor: pointer;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s, background 0.2s;
 }
 
-.startButton:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+#startButton:hover,
+#restartButton:hover {
+    background: #45a049;
+    transform: scale(1.05);
 }
 
-/* Responsive design */
+#startButton:active,
+#restartButton:active {
+    transform: scale(0.95);
+}
+
+#gameOverScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+#gameOverScreen h1 {
+    font-size: 3.5em;
+    color: #ff4444;
+    margin-bottom: 20px;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+}
+
+#finalScore {
+    font-size: 2em;
+    color: #fff;
+    margin: 10px 0;
+}
+
+#motivationMsg {
+    font-size: 1.3em;
+    color: #ffd700;
+    margin: 15px 0;
+    text-align: center;
+    max-width: 80%;
+}
+
+/* Responsive Design for Tablets */
 @media (max-width: 768px) {
-    .gameTitle { font-size: 32px; }
-    .scoreBoard { top: 80px; right: 20px; padding: 15px 20px; }
-    .scoreValue { font-size: 28px; }
-    .highScoreDisplay { top: 80px; left: 20px; padding: 12px 18px; }
-    .highScoreValue { font-size: 22px; }
-    .instructions { font-size: 14px; bottom: 20px; }
-    .overlayTitle { font-size: 48px; }
-    .welcomeTitle { font-size: 48px; }
-    .startButton { padding: 18px 50px; font-size: 24px; }
+    #gameTitle {
+        font-size: 1.8em;
+        top: 10px;
+    }
+
+    #scoreBoard {
+        top: 60px;
+        right: 10px;
+        padding: 10px 15px;
+    }
+
+    .score-item {
+        font-size: 1em;
+    }
+
+    #welcomeScreen h1 {
+        font-size: 2em;
+    }
+
+    #welcomeScreen p {
+        font-size: 1em;
+    }
+
+    #startButton,
+    #restartButton {
+        padding: 12px 30px;
+        font-size: 1.2em;
+    }
+
+    #dino {
+        left: 50px;
+        width: 50px;
+        height: 50px;
+    }
+
+    #gameOverScreen h1 {
+        font-size: 2.5em;
+    }
+
+    #finalScore {
+        font-size: 1.5em;
+    }
+
+    #motivationMsg {
+        font-size: 1.1em;
+    }
+}
+
+/* Responsive Design for Mobile Phones */
+@media (max-width: 480px) {
+    #gameTitle {
+        font-size: 1.5em;
+    }
+
+    #scoreBoard {
+        padding: 8px 12px;
+        top: 50px;
+    }
+
+    .score-item {
+        font-size: 0.9em;
+    }
+
+    #welcomeScreen h1 {
+        font-size: 1.7em;
+    }
+
+    #welcomeScreen p {
+        font-size: 0.9em;
+    }
+
+    #startButton,
+    #restartButton {
+        padding: 10px 25px;
+        font-size: 1em;
+    }
+
+    #dino {
+        left: 30px;
+        width: 45px;
+        height: 45px;
+    }
+
+    #dragon {
+        width: 60px;
+        height: 45px;
+    }
+
+    .obstacle {
+        width: 35px;
+        height: 45px;
+    }
+
+    #gameOverScreen h1 {
+        font-size: 2em;
+    }
+
+    #finalScore {
+        font-size: 1.3em;
+    }
+
+    #motivationMsg {
+        font-size: 1em;
+    }
+}
+
+/* Smooth animations for jumping */
+@keyframes jump {
+    0% { bottom: 100px; }
+    50% { bottom: 300px; }
+    100% { bottom: 100px; }
 }
