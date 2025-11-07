@@ -1,79 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Runner</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iDragon Adventures - Enhanced Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="gameContainer">
-        <div id="gameTitle">🦖 DINO RUNNER 🐉</div>
-        
-        <div id="scoreBoard">
-            <div class="score-item">
-                <span class="score-label">Score:</span>
-                <span id="currentScore">0</span>
-            </div>
-            <div class="score-item">
-                <span class="score-label">High Score:</span>
-                <span id="highScore">0</span>
-            </div>
-            <div class="score-item" id="scoreGap" style="display: none;">
-                <span style="color: #ff6b6b; font-size: 0.9em;"></span>
-            </div>
-        </div>
+  <!-- Welcome -->
+  <div class="welcomeScreen" id="welcomeScreen">
+    <div class="welcomeTitle">🦖 Varun Games 🐉</div>
+    <button class="startButton" onclick="startGame()">START GAME</button>
+  </div>
 
-        <div class="cloud" id="cloud1"></div>
-        <div class="cloud" id="cloud2"></div>
-        <div class="cloud" id="cloud3"></div>
-        <div class="cloud" id="cloud4"></div>
+  <!-- Game -->
+  <div class="gameContainer" id="gameContainer">
+    <!-- Clouds -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="cloud cloud3"></div>
 
-        <div id="dino">
-            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 10 50 Q 10 35 20 30 L 20 20 Q 20 10 30 10 Q 40 10 40 20 L 40 30 Q 50 35 50 50 Z" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
-                <ellipse cx="25" cy="20" rx="3" ry="4" fill="#fff"/>
-                <ellipse cx="35" cy="20" rx="3" ry="4" fill="#fff"/>
-                <circle cx="25" cy="20" r="1.5" fill="#000"/>
-                <circle cx="35" cy="20" r="1.5" fill="#000"/>
-                <path d="M 5 45 L 10 50 L 10 55" fill="none" stroke="#2E7D32" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 50 45 L 50 50 L 55 55" fill="none" stroke="#2E7D32" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 42 10 L 45 5 L 48 10" fill="none" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-        </div>
+    <!-- UI -->
+    <div class="gameTitle">Varun Dragon Adventures</div>
 
-        <div id="dragon">
-            <svg viewBox="0 0 70 50" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 10 25 Q 15 15 25 15 L 40 15 Q 50 15 55 25 Q 60 30 65 25 L 60 30 Q 55 35 45 35 L 25 35 Q 15 35 10 25 Z" fill="#FF6B6B" stroke="#C92A2A" stroke-width="2"/>
-                <polygon points="25,15 30,5 35,15" fill="#FF6B6B" stroke="#C92A2A" stroke-width="1.5"/>
-                <polygon points="40,15 43,8 46,15" fill="#FF6B6B" stroke="#C92A2A" stroke-width="1.5"/>
-                <ellipse cx="30" cy="20" rx="2" ry="3" fill="#FFD700"/>
-                <circle cx="30" cy="20" r="1" fill="#000"/>
-                <path d="M 60 28 Q 70 25 75 30 Q 70 32 65 30" fill="#FF6B6B" stroke="#C92A2A" stroke-width="1.5"/>
-                <path d="M 15 30 L 12 40 L 18 35" fill="#C92A2A"/>
-                <path d="M 25 35 L 23 45 L 27 40" fill="#C92A2A"/>
-            </svg>
-        </div>
-
-        <div id="ground"></div>
-
-        <div id="welcomeScreen">
-            <h1>🦖 DINO RUNNER 🐉</h1>
-            <p>🎮 <strong>PC:</strong> Press SPACE or UP ARROW to jump</p>
-            <p>📱 <strong>Mobile:</strong> Tap anywhere on the screen to jump</p>
-            <p>⚠️ Avoid rocks and dragons!</p>
-            <p>🏆 Dragon appears after score 10</p>
-            <button id="startButton">START GAME</button>
-        </div>
-
-        <div id="gameOverScreen">
-            <h1>GAME OVER!</h1>
-            <div id="finalScore"></div>
-            <div id="motivationMsg"></div>
-            <button id="restartButton">PLAY AGAIN</button>
-        </div>
+    <div class="highScoreDisplay">
+      <div class="highScoreLabel">HIGH SCORE</div>
+      <div class="highScoreValue" id="highScore">0</div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="scoreBoard">
+      <div class="scoreLabel">SCORE</div>
+      <div class="scoreValue" id="score">0</div>
+    </div>
+
+    <div class="instructions">
+      Press <kbd>↑</kbd> Jump | Hold <kbd>←</kbd> <kbd>→</kbd> Move | <kbd>SPACE</kbd> Start/Restart · Swipe ↑ to jump on mobile
+    </div>
+
+    <!-- World -->
+    <div class="ground"></div>
+
+    <!-- Player -->
+    <div class="dino" id="dino"></div>
+
+    <!-- Dragon (antagonist) -->
+    <div class="obstacle" id="obstacle"></div>
+
+    <!-- Rocks lane (new) -->
+    <div class="rocks" id="rocks" aria-hidden="true"></div>
+  </div>
+
+  <!-- Game Over -->
+  <div class="gameOverlay" id="gameOverlay">
+    <div class="overlayContent">
+      <div class="overlayTitle">GAME OVER!</div>
+      <div class="overlaySubtitle">Your Score</div>
+      <div class="finalScore" id="finalScore">0</div>
+      <button class="restartButton" onclick="restartGame()">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
