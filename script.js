@@ -4,7 +4,7 @@ let cross = true;
 let gameActive = false;
 let gameStarted = false;
 
-// --- NEW: movement physics for smoother controls
+/* ----------------------- Smooth movement physics ----------------------- */
 const move = {
   left: false,
   right: false,
@@ -15,23 +15,71 @@ const move = {
 };
 
 const dino = document.getElementById('dino');
-const obstacle = document.getElementById('obstacle'); // dragon
+const obstacle = document.getElementById('obstacle'); // dragon element
 const scoreDisplay = document.getElementById('score');
 const highScoreDisplay = document.getElementById('highScore');
 const gameOverlay = document.getElementById('gameOverlay');
 const finalScoreDisplay = document.getElementById('finalScore');
 const welcomeScreen = document.getElementById('welcomeScreen');
 
-// NEW: rocks lane
+/* ----------------------------- Rocks lane ------------------------------ */
 const rocksLane = document.getElementById('rocks');
 let rocks = [];
+
+/* ------------------------ Difficulty & pacing -------------------------- */
+/* We scale ONLY every +10 points as you asked. These are formulas so
+   everything tightens gradually but stays avoidable. */
+let difficulty = 0;
+let rockInterval = 1700;               // ms between rock spawns (starts chill)
+let rockDurMin = 3.4, rockDurMax = 3.9; // CSS animation time range for rocks
+let minHazardGap = 1200;               // ms gap required between rock & dragon
+let dragonCooldown = 2400;             // ms before dragon can appear again
+let dragonDuration = 3.6;              // seconds for dragon to cross screen
+
 let lastRockAt = 0;
-let rockInterval = 1400; // ms; will shrink with difficulty
+let lastDragonAt = 0;
+let dragonActive = false;
 
-// Dragon animation speed like before, but we need its position roughly
-let animationSpeed = 3;
+/* ------------------------ Dragon appearance loop ----------------------- */
+/* Instead of infinite animation, we fire the dragon in single passes with
+   controlled cooldowns. */
+function spawnDragon() {
+  if (dragonActive) return;
+  dragonActive = true;
 
-// Load high score
+  // Start from right edge; one pass; duration based on difficulty
+  obstacle.style.left = '100vw';
+  obstacle.style.animation = `obstacleMove ${dragonDuration}s linear 1`;
+  obstacle.style.animationPlayState = 'running';
+
+  const endHandler = () => {
+    dragonActive = false;
+    lastDragonAt = performance.now();
+    obstacle.style.animation = 'none';
+    obstacle.removeEventListener('animationend', endHandler);
+  };
+  obstacle.addEventListener('animationend', endHandler);
+}
+
+/* ------------------------------ Utilities ------------------------------ */
+function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+function now() { return performance.now(); }
+
+function setDifficultyFromScore() {
+  const newDiff = Math.floor(score / 10);
+  if (newDiff === difficulty) return;
+  difficulty = newDiff;
+
+  // Pace tuning: each 10 points tightens timings a bit
+  rockInterval = clamp(1700 * Math.pow(0.90, difficulty), 900, 1700);
+  rockDurMin   = clamp(3.4  * Math.pow(0.92, difficulty), 1.9, 3.4);
+  rockDurMax   = clamp(3.9  * Math.pow(0.92, difficulty), 2.4, 3.9);
+  minHazardGap = clamp(1200 * Math.pow(0.92, difficulty), 700, 1200);
+  dragonCooldown = clamp(2400 * Math.pow(0.92, difficulty), 1400, 2400);
+  dragonDuration = clamp(3.6  * Math.pow(0.94, difficulty), 2.2, 3.6);
+}
+
+/* --------------------------- Game lifecycle ---------------------------- */
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('dinoHighScore');
   if (saved) highScore = parseInt(saved, 10) || 0;
@@ -43,18 +91,13 @@ function startGame() {
   setTimeout(() => {
     resetWorld();
     gameActive = true;
-    gameStarted = true;
-    obstacle.classList.add('obstacleAni'); // dragon starts moving
   }, 500);
 }
 
 function restartGame() {
   resetWorld();
   gameOverlay.classList.remove('active');
-  setTimeout(() => {
-    obstacle.classList.add('obstacleAni');
-    gameActive = true;
-  }, 10);
+  setTimeout(() => { gameActive = true; }, 10);
 }
 
 function resetWorld() {
@@ -67,29 +110,33 @@ function resetWorld() {
   move.left = move.right = false;
   move.vel = 0;
 
-  // Dragon speed reset
-  animationSpeed = 3;
-  obstacle.style.animationDuration = animationSpeed + 's';
+  // Difficulty reset
+  difficulty = 0;
+  rockInterval = 1700;
+  rockDurMin = 3.4; rockDurMax = 3.9;
+  minHazardGap = 1200;
+  dragonCooldown = 2400;
+  dragonDuration = 3.6;
 
   // Dino reset
   dino.style.left = '100px';
   dino.classList.remove('animateDino');
 
-  // Clear rocks
+  // Rocks reset
   for (const r of rocks) r.el.remove();
   rocks = [];
-  rockInterval = 1400;
-  lastRockAt = performance.now();
+  lastRockAt = now();
 
-  // Ensure dragon animation restarts cleanly
-  obstacle.classList.remove('obstacleAni');
+  // Dragon reset
+  dragonActive = false;
+  obstacle.style.animation = 'none';
   obstacle.style.left = '100vw';
-  void obstacle.offsetWidth; // reflow
+  lastDragonAt = now() - dragonCooldown; // eligible soon
 }
 
-// --- Controls (smooth) ---
+/* ------------------------------- Controls ------------------------------ */
 document.addEventListener('keydown', (e) => {
-  if (!gameStarted && e.code === 'Space') { startGame(); return; }
+  if (!gameStarted && e.code === 'Space') { gameStarted = true; startGame(); return; }
   if (!gameActive && e.code === 'Space' && gameStarted) { restartGame(); return; }
   if (!gameActive) return;
 
@@ -102,24 +149,24 @@ document.addEventListener('keyup', (e) => {
   if (e.code === 'ArrowRight') move.right = false;
 });
 
-// Touch (swipe up to jump; horizontal swipe = nudge)
+// Touch (swipe up to jump; horizontal swipe is a nudge)
 let touchStartX = 0, touchStartY = 0, touchStartT = 0;
 document.addEventListener('touchstart', (e) => {
   const t = e.touches[0];
-  touchStartX = t.clientX; touchStartY = t.clientY; touchStartT = performance.now();
+  touchStartX = t.clientX; touchStartY = t.clientY; touchStartT = now();
 }, {passive:true});
 document.addEventListener('touchend', (e) => {
   const t = e.changedTouches[0];
   const dx = t.clientX - touchStartX;
   const dy = t.clientY - touchStartY;
-  const dt = performance.now() - touchStartT;
+  const dt = now() - touchStartT;
 
-  if (!gameStarted) { startGame(); return; }
+  if (!gameStarted) { gameStarted = true; startGame(); return; }
   if (!gameActive) { restartGame(); return; }
+
   if (Math.abs(dy) > Math.abs(dx) && dy < -30 && dt < 500) {
-    jump(); // swipe up
+    jump();
   } else if (Math.abs(dx) > 30) {
-    // nudge left/right for mobile
     const dinoX = parseInt(getComputedStyle(dino).left, 10) || 100;
     const step = Math.min(Math.abs(dx), 160);
     const dir = dx > 0 ? 1 : -1;
@@ -142,57 +189,48 @@ function setDinoX(x) {
   dino.style.left = nx + 'px';
 }
 
-// --- NEW: Rock spawner (fairness with dragon) ---
+/* --------------------------- Rock management --------------------------- */
 function spawnRock() {
   const el = document.createElement('div');
   el.className = 'rock';
-  // random size class
+  // random size
   const r = Math.random();
   if (r < 0.25) el.classList.add('small');
   if (r > 0.75) el.classList.add('large');
 
-  // variable duration (faster later)
-  const dur = Math.max(1.5, rockInterval / 900); // ~1.5s min visual time
-  el.style.setProperty('--dur', (dur + (Math.random() * 0.35 - 0.15)).toFixed(2) + 's');
+  // duration drawn from current range (slower early)
+  const dur = (rockDurMin + Math.random() * (rockDurMax - rockDurMin));
+  el.style.setProperty('--dur', dur.toFixed(2) + 's');
   el.classList.add('rockAni');
 
-  // track for scoring/collision
   el.dataset.passed = '0';
   rocksLane.appendChild(el);
 
-  // auto cleanup after animation completes
   el.addEventListener('animationend', () => {
     el.remove();
-    // purge from array
-    rocks = rocks.filter(rk => rk.el !== el);
+    rocks = rocks.filter(k => k.el !== el);
   });
 
-  // store reference
   rocks.push({ el });
 }
 
-// ensure rocks don’t spawn immediately on top of dragon
 function safeToSpawnRock() {
-  // approximate dragon position using its bounding rect
+  if (!dragonActive) return true;
+  // If dragon is in the right 55% of the screen (entering), delay rock
   const dr = obstacle.getBoundingClientRect();
-  // if dragon is near right 40% of screen, hold spawns to avoid impossible stacks
-  const nearRight = dr.left > window.innerWidth * 0.6;
-  return !nearRight;
+  return !(dr.left > window.innerWidth * 0.45);
 }
 
-// --- Difficulty scaling ---
-function updateDifficulty() {
-  // increase difficulty every 5 score: faster dragon & more frequent rocks
-  if (score > 0 && score % 5 === 0) {
-    // tighten rock interval
-    rockInterval = Math.max(700, rockInterval * 0.88);
-    // speed up dragon a touch
-    animationSpeed = Math.max(1.6, animationSpeed - 0.10);
-    obstacle.style.animationDuration = animationSpeed + 's';
-  }
+/* -------------------------- Dragon scheduling -------------------------- */
+function maybeSpawnDragon(t) {
+  if (score < 10) return; // dragon unlock
+  if (dragonActive) return;
+  if (t - lastDragonAt < dragonCooldown) return;
+  if (t - lastRockAt < minHazardGap) return; // keep playable spacing
+  spawnDragon();
 }
 
-// Particles (kept)
+/* ----------------------------- Particles ------------------------------- */
 function createParticles(x, y) {
   for (let i = 0; i < 8; i++) {
     const p = document.createElement('div');
@@ -205,68 +243,7 @@ function createParticles(x, y) {
   }
 }
 
-// --- Main loop: movement + collisions + spawns ---
-let tPrev = performance.now();
-function frame(tNow) {
-  if (gameActive) {
-    const dt = Math.min((tNow - tPrev) / 1000, 0.032);
-    // smooth horizontal movement
-    if (move.left && !move.right) {
-      move.vel -= move.accel * dt;
-    } else if (move.right && !move.left) {
-      move.vel += move.accel * dt;
-    } else {
-      // friction
-      if (move.vel > 0) move.vel = Math.max(0, move.vel - move.friction * dt);
-      else if (move.vel < 0) move.vel = Math.min(0, move.vel + move.friction * dt);
-    }
-    move.vel = Math.max(-move.max, Math.min(move.vel, move.max));
-    if (Math.abs(move.vel) > 0.01) {
-      const x = parseInt(getComputedStyle(dino).left, 10) || 100;
-      setDinoX(x + move.vel * dt);
-    }
-
-    // Spawn rocks
-    if (tNow - lastRockAt >= rockInterval) {
-      if (safeToSpawnRock()) {
-        spawnRock();
-        lastRockAt = tNow;
-      } else {
-        // retry shortly to avoid unfair overlap
-        lastRockAt = tNow - (rockInterval * 0.6);
-      }
-    }
-
-    // Collisions & scoring
-    const dinoRect = dino.getBoundingClientRect();
-    const dragonRect = obstacle.getBoundingClientRect();
-
-    // Dragon collision
-    if (rectsOverlap(dinoRect, dragonRect, 10)) endGame();
-
-    // Rock collisions + pass scoring
-    for (const rk of rocks) {
-      const rr = rk.el.getBoundingClientRect();
-      if (rectsOverlap(dinoRect, rr, 8)) {
-        endGame();
-        break;
-      }
-      // passed if rock's right < dino left and not counted
-      if (rk.el.dataset.passed === '0' && rr.right < dinoRect.left) {
-        rk.el.dataset.passed = '1';
-        score += 1;
-        scoreDisplay.textContent = score;
-        createParticles(dinoRect.left + 30, 180);
-        updateDifficulty();
-      }
-    }
-  }
-
-  tPrev = tNow;
-  requestAnimationFrame(frame);
-}
-requestAnimationFrame(frame);
-
+/* ------------------------------- Collisions ---------------------------- */
 function rectsOverlap(a, b, pad=0) {
   return !(
     a.right - pad < b.left + pad ||
@@ -276,10 +253,79 @@ function rectsOverlap(a, b, pad=0) {
   );
 }
 
+/* ------------------------------- Game loop ----------------------------- */
+let tPrev = performance.now();
+function frame(tNow) {
+  if (gameActive) {
+    const dt = Math.min((tNow - tPrev) / 1000, 0.032);
+
+    // Smooth horizontal move
+    if (move.left && !move.right)      move.vel -= move.accel * dt;
+    else if (move.right && !move.left) move.vel += move.accel * dt;
+    else {
+      if (move.vel > 0) move.vel = Math.max(0, move.vel - move.friction * dt);
+      else if (move.vel < 0) move.vel = Math.min(0, move.vel + move.friction * dt);
+    }
+    move.vel = clamp(move.vel, -move.max, move.max);
+    if (Math.abs(move.vel) > 0.01) {
+      const x = parseInt(getComputedStyle(dino).left, 10) || 100;
+      setDinoX(x + move.vel * dt);
+    }
+
+    // Spawn rocks with rational spacing
+    const t = tNow;
+    if (t - lastRockAt >= rockInterval && safeToSpawnRock() && (t - lastDragonAt) >= minHazardGap) {
+      spawnRock();
+      lastRockAt = t;
+    }
+
+    // Possibly spawn dragon (single pass)
+    maybeSpawnDragon(t);
+
+    // Collisions and scoring
+    const dinoRect = dino.getBoundingClientRect();
+
+    // Dragon collision
+    if (dragonActive) {
+      const dragonRect = obstacle.getBoundingClientRect();
+      if (rectsOverlap(dinoRect, dragonRect, 10)) endGame();
+      // Award +1 when you pass the dragon (mirrors your original idea)
+      if (cross && dragonRect.left < dinoRect.left - 10) {
+        score += 1;
+        scoreDisplay.textContent = score;
+        cross = false;
+        setTimeout(() => (cross = true), 700);
+        setDifficultyFromScore();
+      }
+    }
+
+    // Rocks
+    for (const rk of rocks) {
+      const rr = rk.el.getBoundingClientRect();
+      if (rectsOverlap(dinoRect, rr, 8)) { endGame(); break; }
+      if (rk.el.dataset.passed === '0' && rr.right < dinoRect.left) {
+        rk.el.dataset.passed = '1';
+        score += 1;
+        scoreDisplay.textContent = score;
+        createParticles(dinoRect.left + 30, 180);
+        setDifficultyFromScore();
+      }
+    }
+  }
+
+  tPrev = tNow;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ------------------------------- End game ------------------------------ */
 function endGame() {
   if (!gameActive) return;
   gameActive = false;
-  obstacle.classList.remove('obstacleAni');
+
+  // stop dragon immediately
+  obstacle.style.animationPlayState = 'paused';
+
   gameOverlay.classList.add('active');
   finalScoreDisplay.textContent = score;
 
@@ -290,29 +336,7 @@ function endGame() {
   }
 }
 
-// Legacy polling loop (kept for compatibility with dragon scoring proximity)
-const legacyLoop = setInterval(() => {
-  if (!gameActive) return;
-
-  const dinoRect = dino.getBoundingClientRect();
-  const dragonRect = obstacle.getBoundingClientRect();
-
-  const dx = dinoRect.left;
-  const dy = window.innerHeight - dinoRect.bottom;
-
-  const ox = dragonRect.left;
-  const oy = window.innerHeight - dragonRect.bottom;
-
-  const offsetX = Math.abs(dx - ox);
-  const offsetY = Math.abs(dy - oy);
-
-  // Award +1 when you pass the dragon (mirrors your original logic)
-  if (offsetX < 100 && cross && ox < dx) {
-    score += 1;
-    scoreDisplay.textContent = score;
-    cross = false;
-    createParticles(dx + 30, 180);
-    setTimeout(() => (cross = true), 700);
-    updateDifficulty();
-  }
-}, 80);
+/* --------------------------- Legacy shortcuts -------------------------- */
+document.addEventListener('keydown', (e) => {
+  if (!gameStarted && e.code === 'Space') { gameStarted = true; }
+});
